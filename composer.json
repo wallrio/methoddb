@@ -1,0 +1,16 @@
+{
+    "name": "wallacerio/methoddb",
+    "description": "ORM using method",
+    "homepage": "https://github.com/wallacerio/MethodDB",
+    "authors": [
+        {
+            "name": "Wallace Rio",
+            "email": "wallrio@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {        
+        "classmap": ["src/"]        
+    }   
+}
