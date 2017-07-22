@@ -1,7 +1,7 @@
 {
-    "name": "wallacerio/methoddb",
+    "name": "wallrio/methoddb",
     "description": "ORM using method",
-    "homepage": "https://github.com/wallacerio/MethodDB",
+    "homepage": "https://github.com/wallrio/methoddb",
     "authors": [
         {
             "name": "Wallace Rio",
