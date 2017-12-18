@@ -19,8 +19,7 @@ ORM using method
     ));
 
 ## Setup the base with DJDB
-
-$methodDB = new MethodDB();
+    
     $methodDB->config(array(
         'driver'=>'djdb',
         'host'=> __DIR__,
