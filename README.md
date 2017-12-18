@@ -1,4 +1,4 @@
-MethodDB
+MethodDB v1.2
 ====
 ORM using method
 
@@ -8,7 +8,7 @@ ORM using method
     $methodDB = new MethodDB();
 
 
-## Setup the base
+## Setup the base with MYSQL
 
     $methodDB->config(array(
     	'driver'=>'mysql',	
@@ -17,6 +17,20 @@ ORM using method
     	'password'=>'password',
     	'base'=>'base_name'
     ));
+
+## Setup the base with DJDB
+
+$methodDB = new MethodDB();
+    $methodDB->config(array(
+        'driver'=>'djdb',
+        'host'=> __DIR__,
+        'base'=>'base_name'
+    ));
+
+    ### Detail:
+
+        - host: directory to record the data
+        - base: sub-directory of 'host' to base
 
 ## Conect with the database
 
@@ -164,3 +178,6 @@ ORM using method
         'password'=>'password',
         'base'=>'base_name'
     ))
+    $database = $methodDB->connect();
+
+

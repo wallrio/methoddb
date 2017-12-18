@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * DJDB v1.1
+ * MethodDB DJDB driver v1.2
  * Database based in Directory structure and JSON
  * 
  * Autor: Wallace Rio <wallrio@gmail.com>
@@ -26,7 +26,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 		$this->config = $config;
 		$host = $this->config['host'];
 		$base = $this->config['base'];
-		$baseDir = $host.$base.DIRECTORY_SEPARATOR;
+		$baseDir = $host.DIRECTORY_SEPARATOR.$base;
 		$this->baseDir = $baseDir;		
 	}
 
@@ -162,7 +162,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 			$limitEnd = $limit;
 		}
 				
-		$registerDir = $this->baseDir.''.$tableName;
+		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
 		
 		$index = 0;
@@ -192,16 +192,21 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 * @return [type]             [description]
 	 */
 	public function insert($tableName, $parameters){
-		$registerDir = $this->baseDir.''.$tableName;
+		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 	
-		$userid = md5(uniqid());
+		if(isset($parameters->id))
+			$userid = $parameters->id;
+		else
+			$userid = md5(uniqid());
+		
 		$data = json_encode($parameters);
 
 		$userDir = $registerDir.DIRECTORY_SEPARATOR.$userid.DIRECTORY_SEPARATOR;
 		$userFile = $userDir.'methoddb_data.json';
 
+
 		if(!file_exists($userDir))
-			mkdir($userDir,0777);
+			mkdir($userDir,0777,true);
 
 		if(file_put_contents($userFile, $data))
 			return true;
@@ -221,7 +226,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 		$parameters = array_values($parameters);
 		$parameters = $parameters[0];
 		
-		$registerDir = $this->baseDir.''.$tableName;
+		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
 				
 		$index = 0;
@@ -254,7 +259,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 		$found = false;
 		$where = isset($parameters['where'])?$parameters['where']:'';
 		
-		$registerDir = $this->baseDir.''.$tableName;
+		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
 		
 		$index = 0;

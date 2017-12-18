@@ -1,6 +1,6 @@
 <?php
 /**
- * MethodDB
+ * MethodDB MYSQL driver v1.1
  * ========
  * ORM using method
  *
