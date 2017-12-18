@@ -26,7 +26,7 @@ ORM using method
         'base'=>'base_name'
     ));
 
-    ### Detail:
+### Detail:
 
         - host: directory to record the data
         - base: sub-directory of 'host' to base
