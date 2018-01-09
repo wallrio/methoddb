@@ -5,9 +5,9 @@
  * ORM using method
  *
  * This file is part of the MethodDB.
- * 
+ *
  * Wallace Rio <wallrio@gmail.com>
- * 
+ *
  */
 
 class MethodDBEntity{
@@ -47,24 +47,24 @@ class MethodDBEntity{
 		foreach ($insertObject as $key => $value) {
 			$tableName = $key;
 			foreach ($value as $key2 => $value2) {
-				$this->__drive__->insert($tableName, $value2);	
-			}			
+				$this->__drive__->insert($tableName, $value2);
+			}
 		}
 
 		$updateObject = $this->updateObject;
 		if(count($updateObject)>0)
 		foreach ($updateObject as $key => $value) {
 			$tableName = $key;
-			$this->__drive__->update($tableName,$value);			
+			$this->__drive__->update($tableName,$value);
 		}
-	
+
 		$this->insertObject = null;
-		$this->updateObject = null;	
+		$this->updateObject = null;
 
 		return true;
 	}
 
-	
+
 	/**
 	 * delete register
 	 * @param  [array] $array [description]
@@ -72,7 +72,7 @@ class MethodDBEntity{
 	 */
 	public function delete($array){
 		$table = $this->__target__;
-		$this->__drive__->delete($table,$array);	
+		$this->__drive__->delete($table,$array);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class MethodDBEntity{
 			$this->updateObject[$table] = array();
 
 		$this->updateObject[$table]['_filter_'] = $where;
-		$coutRow = count($this->updateObject[$table]);		
+		$coutRow = count($this->updateObject[$table]);
 		$this->updateObject[$table][$coutRow] = (object) array();
 		return $this->updateObject[$table][$coutRow];
 	}
@@ -100,8 +100,8 @@ class MethodDBEntity{
 		if(!isset($this->insertObject[$table]))
 			$this->insertObject[$table] = array();
 
-		$coutRow = count($this->insertObject[$table]);		
-		$this->insertObject[$table][$coutRow] = (object) array();	
+		$coutRow = count($this->insertObject[$table]);
+		$this->insertObject[$table][$coutRow] = (object) array();
 		return $this->insertObject[$table][$coutRow];
 	}
 
@@ -111,8 +111,8 @@ class MethodDBEntity{
 	 * @param  [type] $params [description]
 	 * @return [type]         [description]
 	 */
-	function __call($func, $params){			
-		if($this->__method__[$func])		
+	function __call($func, $params){
+		if($this->__method__[$func])
 			return $this->__method__[$func]($func, $params,$this->__drive__);
 	}
 
@@ -125,20 +125,19 @@ class MethodDBEntity{
 		if(!isset($config['driver'])) return false;
 
 		$this->__drive__ = $config['driveObject'];
-		$config['driveObject']->connect($config);		
-		$result = $config['driveObject']->tables();		
-		if(count($result)>0)
+		$config['driveObject']->connect($config);
+		$result = $config['driveObject']->tables();
+
+
+		if( is_array($result) && count($result)>0)
 		foreach ($result as $key => $value) {
-			$nameTable = $value;		
-			$this->__method__[$nameTable] = function($methodName,$parameters,$drive){								
-				$result = $drive->select($methodName,$parameters);								
+			$nameTable = $value;
+			$this->__method__[$nameTable] = function($methodName,$parameters,$drive){
+				$result = $drive->select($methodName,$parameters);
 				return  $result;
 			};
 		}
 	}
 
-	
+
 }
-
-
-

@@ -1,15 +1,15 @@
 <?php
 /**
- * 
+ *
  * MethodDB DJDB driver v1.2
  * Database based in Directory structure and JSON
- * 
+ *
  * Autor: Wallace Rio <wallrio@gmail.com>
- * 
+ *
  */
 
 class methoddb_driver_djdb implements MethodDBDRIVERS{
-	
+
 	private $baseDir = null;
 	private $instance;
 
@@ -22,34 +22,34 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 
 		if(!isset($config['host'])) throw new Exception("host missing");
 		if(!isset($config['base'])) throw new Exception("base missing");
-		
+
 		$this->config = $config;
 		$host = $this->config['host'];
 		$base = $this->config['base'];
 		$baseDir = $host.DIRECTORY_SEPARATOR.$base;
-		$this->baseDir = $baseDir;		
+		$this->baseDir = $baseDir;
 	}
 
 	/**
 	 * [whereApply description]
 	 * @param  [type] $content   [description]
 	 * @param  [type] $condition [description]
-	 * @return [type]          
-	 * 
+	 * @return [type]
+	 *
 	 *  OBS: no support sub parents char.
 	 *  () > support
 	 *  (()) > not support
-	 *  
+	 *
 	 *  example:
 	 *  ( val1 == val2 ) > support
 	 *  ( (val1==val2) && val1 == val3 ) > not support
 	 */
 	public function whereApply($content = null,$condition = null){
-		
+
 
 		$conditionSplit = preg_split('/ (and|or) /i', $condition,null,PREG_SPLIT_DELIM_CAPTURE);
-					
-					
+
+
 		$query ='';
 		foreach ($conditionSplit as $key => $value) {
 			if(strtolower($value) == 'and'){
@@ -63,12 +63,12 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 			$userParentClose = false;
 			$unitConditionSplit = preg_split('/ *?(!=|=|like|<>) *?/i', $value,null,PREG_SPLIT_DELIM_CAPTURE);
 
-			
+
 
 			$condKey = $unitConditionSplit[0];
 			$condOperator = $unitConditionSplit[1];
 			$condVal = $unitConditionSplit[2];
-			
+
 			$condVal = trim($condVal);
 			$condKey = trim($condKey);
 
@@ -76,65 +76,65 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 
 			if(strpos($condKey, '(')!== false){
 				$condKey = str_replace('(', '', $condKey);
-				$condVal = "(".$condVal;				
+				$condVal = "(".$condVal;
 			}
 
 			if(strpos($condVal, ')')!== false){
-				$condVal = str_replace(')', '', $condVal);		
-				$userParentClose = true;	
+				$condVal = str_replace(')', '', $condVal);
+				$userParentClose = true;
 			}
 
 			if(strtolower($condOperator) == '='){
-				$operator = ' === ';				
+				$operator = ' === ';
 			}elseif(strtolower($condOperator) == '=='){
-				$operator = ' != ';				
+				$operator = ' != ';
 			}elseif(strtolower($condOperator) == '<>'){
-				$operator = ' <> ';				
+				$operator = ' <> ';
 			}elseif(strtolower($condOperator) == '<='){
-				$operator = ' <= ';	
+				$operator = ' <= ';
 			}elseif(strtolower($condOperator) == '>='){
-				$operator = ' >= ';				
+				$operator = ' >= ';
 			}elseif(strtolower($condOperator) == 'like'){
-				$operator = ' = ';				
+				$operator = ' = ';
 			}elseif(strtolower($condOperator) == 'soundex'){
-				$operator = ' === ';				
+				$operator = ' === ';
 			}
 
 
 
 			$condKey = str_replace('.', '->', $condKey);
 
-			
-			
+
+
 			eval('$condVal2Pre = isset($content->'.$condKey.')?$content->'.$condKey.':null;');
-			
+
 
 			if(gettype($condVal2Pre) == 'integer'){
-				eval('$condVal2 = $content->'.$condKey.';');			
+				eval('$condVal2 = $content->'.$condKey.';');
 			}elseif(gettype($condVal2Pre) == 'string'){
-				eval('$condVal2 = $wrapperVal.$content->'.$condKey.'.$wrapperVal;');				
+				eval('$condVal2 = $wrapperVal.$content->'.$condKey.'.$wrapperVal;');
 			}else{
 				return false;
 			}
 
 
-			if($userParentClose == true){				
-				$condVal2 = $condVal2.")";				
+			if($userParentClose == true){
+				$condVal2 = $condVal2.")";
 			}
 
-			
+
 			if(strtolower($condOperator) == 'like' || strtolower($condOperator) == 'soundex'){
-				$query .= "soundex(".$condVal.")" ."===". "soundex(".$condVal2.")";		
+				$query .= "soundex(".$condVal.")" ."===". "soundex(".$condVal2.")";
 			}else{
-				$query .= $condVal .$operator. $condVal2;		
+				$query .= $condVal .$operator. $condVal2;
 			}
-			
-			
+
+
 		}
-		
-		
+
+
 		eval('$return = '.$query.';');
-		
+
 		return $return;
 	}
 
@@ -146,8 +146,8 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 * @return [type]             [description]
 	 */
 	public function select($tableName, $parameters){
-		
-		
+
+
 
 		$where = isset($parameters[0]['where'])?$parameters[0]['where']:null;
 		$limit = isset($parameters[0]['limit'])?$parameters[0]['limit']:null;
@@ -161,18 +161,18 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 			$limitStart = 0;
 			$limitEnd = $limit;
 		}
-				
+
 		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
-		
+
 		$index = 0;
 		$foundList = Array();
 		foreach ($list as $key => $value) {
 			$filename = $registerDir.DIRECTORY_SEPARATOR.$value.DIRECTORY_SEPARATOR."methoddb_data.json";
 			$contentJSON = file_get_contents($filename);
 			$content = json_decode($contentJSON);
-			
-			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){			
+
+			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){
 				if(($index) >= $limitStart  && ($index ) < ($limitStart + $limitEnd) || $limit == null)
 				$foundList[$value] = $content;
 			}
@@ -193,12 +193,12 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 */
 	public function insert($tableName, $parameters){
 		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
-	
+
 		if(isset($parameters->id))
 			$userid = $parameters->id;
 		else
 			$userid = md5(uniqid());
-		
+
 		$data = json_encode($parameters);
 
 		$userDir = $registerDir.DIRECTORY_SEPARATOR.$userid.DIRECTORY_SEPARATOR;
@@ -211,7 +211,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 		if(file_put_contents($userFile, $data))
 			return true;
 
-		return false;		
+		return false;
 	}
 
 	/**
@@ -220,33 +220,33 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 * @param  [type] $parameters [description]
 	 * @return [type]             [description]
 	 */
-	public function update($tableName, $parameters){		
+	public function update($tableName, $parameters){
 		$where = isset($parameters['_filter_']['where'])?$parameters['_filter_']['where']:null;
 		unset($parameters['_filter_']);
 		$parameters = array_values($parameters);
 		$parameters = $parameters[0];
-		
+
 		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
-				
+
 		$index = 0;
 		$foundList = Array();
 		foreach ($list as $key => $value) {
 			$filename = $registerDir.DIRECTORY_SEPARATOR.$value.DIRECTORY_SEPARATOR."methoddb_data.json";
 			$contentJSON = file_get_contents($filename);
 			$content = json_decode($contentJSON);
-			
-			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){		
+
+			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){
 				$foundList[$value] = $content;
 				foreach ($parameters as $key2 => $value2) {
 					$content->$key2 = $value2;
 				}
-				file_put_contents($filename,json_encode($content));				
+				file_put_contents($filename,json_encode($content));
 			}
 			$index++;
 		}
-		
-		
+
+
 	}
 
 	/**
@@ -258,10 +258,10 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	public function delete($tableName, $parameters){
 		$found = false;
 		$where = isset($parameters['where'])?$parameters['where']:'';
-		
+
 		$registerDir = $this->baseDir.DIRECTORY_SEPARATOR.$tableName;
 		$list = $this->scanDir($registerDir);
-		
+
 		$index = 0;
 		$foundList = Array();
 		foreach ($list as $key => $value) {
@@ -269,14 +269,14 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 			$filename = $dirItem."methoddb_data.json";
 			$contentJSON = file_get_contents($filename);
 			$content = json_decode($contentJSON);
-			
-			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){		
+
+			if( ($where !=null && $this->whereApply($content,$where)) ||  $where ==null ){
 				$found = true;
 				$foundList[$value] = $content;
 				foreach ($parameters as $key2 => $value2) {
 					$content->$key2 = $value2;
 				}
-				$this->rmdir($dirItem);						
+				$this->rmdir($dirItem);
 			}
 			$index++;
 		}
@@ -299,7 +299,7 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 * @return [type]      [description]
 	 */
 	private function scanDir($dir = null){
-		if($dir == null)return false;
+		if($dir == null || !file_exists($dir))return false;
 		$dirList = scandir($dir);
 		foreach ($dirList as $key => $value) {
 			if($value=='.' || $value=='..')
@@ -314,16 +314,16 @@ class methoddb_driver_djdb implements MethodDBDRIVERS{
 	 * @param  [type] $dir [description]
 	 * @return [type]      [description]
 	 */
-	public static function rmdir($dir) { 
-       if (is_dir($dir)) { 
-         $objects = scandir($dir); 
-         foreach ($objects as $object) { 
-           if ($object != "." && $object != "..") { 
-             if (filetype($dir."/".$object) == "dir") self::rmdir($dir."/".$object); else unlink($dir."/".$object); 
-           } 
-         } 
-         reset($objects); 
-         rmdir($dir); 
-       } 
+	public static function rmdir($dir) {
+       if (is_dir($dir)) {
+         $objects = scandir($dir);
+         foreach ($objects as $object) {
+           if ($object != "." && $object != "..") {
+             if (filetype($dir."/".$object) == "dir") self::rmdir($dir."/".$object); else unlink($dir."/".$object);
+           }
+         }
+         reset($objects);
+         rmdir($dir);
+       }
      }
 }
