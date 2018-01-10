@@ -22,17 +22,17 @@ ORM using method
 
 ### with DJDB
 
-    
+
     $methodDB->config(array(
         'driver'=>'djdb',
         'host'=> __DIR__,
         'base'=>'base_name'
     ));
 
-    ### Detail:
+#### Detail:
 
-        - host: directory to record the data
-        - base: sub-directory of 'host' to base
+    - host: directory to record the data
+    - base: sub-directory of 'host' to base
 
 
 ## Connect with the database
