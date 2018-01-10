@@ -22,7 +22,7 @@ ORM using method
 
 ### with DJDB
 
-$methodDB = new MethodDB();
+    
     $methodDB->config(array(
         'driver'=>'djdb',
         'host'=> __DIR__,
