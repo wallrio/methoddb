@@ -10,24 +10,41 @@ ORM using method
 
 ## Setup the base
 
+###  with MySQL
+
     $methodDB->config(array(
-    	'driver'=>'mysql',	
+    	'driver'=>'mysql',
     	'host'=>'host',
     	'username'=>'username',
     	'password'=>'password',
     	'base'=>'base_name'
     ));
 
-## Conect with the database
+### with DJDB
+
+$methodDB = new MethodDB();
+    $methodDB->config(array(
+        'driver'=>'djdb',
+        'host'=> __DIR__,
+        'base'=>'base_name'
+    ));
+
+    ### Detail:
+
+        - host: directory to record the data
+        - base: sub-directory of 'host' to base
+
+
+## Connect with the database
 
     $database = $methodDB->connect();
 
 ## Check the entities
-    
+
     $tablesArray =  $database->entities();
 
 ## Request data of a table (SELECT)
-  
+
     $array = $database->TABLE_NAME();
 
         example:
@@ -66,7 +83,7 @@ ORM using method
 
     $users->name = "Company name";
     $users->login = "company@domain.com";
-    
+
     $database->save();    
 
 
@@ -90,10 +107,10 @@ ORM using method
     $database->save();    
 
 
-## To create a new driver 
-    
+## To create a new driver
+
     To create a new driver, you must follow the interface below.
- 
+
     interface MethodDBDRIVERS{  
 
     /**
@@ -116,7 +133,7 @@ ORM using method
      *                              "password"=>"123"
      *                          )
      *                      );
-     * 
+     *
      */
     public function select($tableName, $parameters);
 
@@ -146,7 +163,7 @@ ORM using method
 
     /**
      * get list the entities
-     * @return [array] 
+     * @return [array]
      *
      * @example-return: array("user","administrators","logs");
      *
